@@ -10,16 +10,13 @@ function isPalindrome(str) {
     newString += normalizedString[i];
   }
 
-  return newString === normalizedString ? 'Строка является палиндромом' : 'Строка не является палиндромом';
+  return newString === normalizedString;
 }
 
 function extractInteger(value) {
   if (value) {
     const digits = [];
-    const normalizedValue =
-    typeof value === 'number'
-      ? Math.abs(value).toString()
-      : value.replaceAll(' ', '');
+    const normalizedValue = value.toString(); // этого достаточно на этапе инициализации переменной, т.к. цифры собираются ниже в цикле
 
     for (let i = 0; i < normalizedValue.length; i++) {
       if (!isNaN(normalizedValue[i])) {
@@ -27,7 +24,7 @@ function extractInteger(value) {
       }
     }
 
-    return digits.length ? parseInt(digits.join(''), 10) : NaN;
+    return parseInt(digits.join(''), 10); // если digit пустой массив, то join вернет пустую строку, далее parseInt('', 10) вернет NaN
   }
 
   return NaN;
