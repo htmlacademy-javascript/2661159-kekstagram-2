@@ -74,8 +74,6 @@ const createUniqueValueFromRange = (min, max) => {
 // Перемешивание массива
 const shuffleArray = (array)=> array.sort(()=> Math.random() - 0.5);
 
-const getPhotoID = createUniqueValueFromRange(PHOTO_RANGE.MIN, PHOTO_RANGE.MAX);
-
 const getCommentID = createUniqueValueFromRange(COMMENTS_RANGE.MIN, COMMENTS_RANGE.MAX);
 
 const getCommentItem = ()=> {
@@ -92,15 +90,14 @@ const getCommentItem = ()=> {
   };
 };
 
-const getPhotoItem = () => {
-  const id = getPhotoID();
-  const url = `photos/${ id }.jpg`;
-  const description = ALTERNATE_TEXTS[id - 1];
+const getPhotoItem = (index) => {
+  const url = `photos/${ index + 1 }.jpg`;
+  const description = ALTERNATE_TEXTS[index];
   const likes = getRandomPositiveInteger(LIKES_RANGE.MIN, LIKES_RANGE.MAX);
   const comments = Array.from({ length: getRandomPositiveInteger(COMMENTS_RANGE.MIN, COMMENTS_RANGE.MAX) }, getCommentItem);
 
   return {
-    id,
+    id: index + 1,
     url,
     description,
     likes,
@@ -108,7 +105,11 @@ const getPhotoItem = () => {
   };
 };
 
-export const photos = Array.from({ length: PHOTO_RANGE.MAX }, getPhotoItem); //export, что бы линтер не ругался
+const photos = [];
+
+for (let i = 0; i < PHOTO_RANGE.MAX; i++) {
+  photos.push(getPhotoItem(i));
+}
 
 // чтобы посмотреть результат в консоли нужно удалить 'export' (удалит ошибку SyntaxError в консоли) на строке 111 и раскомментировать строку 114
 // console.log(photos);
