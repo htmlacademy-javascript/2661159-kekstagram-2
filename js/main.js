@@ -1,8 +1,8 @@
-import { ranges } from './constants.js';
-import { photos, getPhotoItem } from './photo-data-generator.js';
+import { MAX_PHOTO_NUMBER } from './utils.js';
+import { getPhotos } from './photo-data-generator.js';
 
-for (let i = 0; i < ranges().PHOTO_RANGE.MAX; i++) {
-  photos.push(getPhotoItem(i));
-}
+const photos = [];
+
+getPhotos(photos, MAX_PHOTO_NUMBER);
 
 // console.log(photos);

@@ -1,14 +1,58 @@
-import { getRandomPositiveInteger, createUniqueValueFromRange, shuffleArray } from './utils.js';
-import { ranges } from './constants.js';
-import { data } from './data.js';
+import {
+  LIKES_RANGE,
+  COMMENTS_RANGE,
+  AVATAR_RANGE,
+  getRandomPositiveInteger,
+  createUniqueValueFromRange,
+  shuffleArray
+} from './utils.js';
 
-const getCommentID = createUniqueValueFromRange(ranges().COMMENTS_RANGE.MIN, ranges().COMMENTS_RANGE.MAX);
+const ALTERNATE_TEXTS = [
+  'Вид на пляж с высоты птичьего полета',
+  'Табличка "Как пройти на пляж"',
+  'Море, камни, песок',
+  'Девушка в купальнике с фотоаппаратом',
+  'Две миски с рисом в виде человечков',
+  'Черный спортивный автомобиль с открытой наверх водительской дверью',
+  'Деревянная миска с разрезанной на двое клубникой и вилка',
+  'Две кружки с морсом из красной смородины и ветки смородины',
+  'Девушка на пляже и пролетающий над ней самолет',
+  'Разная обувь в обувнице',
+  'Песчаная дорога на пляж вдоль забора',
+  'Белый спортивный автомобиль "Ауди"',
+  'Блюдо из свежих фруктов и овощей',
+  'Шуточная картинка с рыжим котом',
+  'Фотография ног в тапках в виде ботинок робота',
+  'Летящий самолёт',
+  'Хор, барабанщик и их руководитель на сцене',
+  'Красный ретро автомобиль в помещении из кирпича',
+  'Фотография ног в тапках с фонариком',
+  'Вечерняя фотография пальм на площади с подсветкой',
+  'Мясное кушанье на деревянной тарелке и вилка',
+  'Купающиеся в море пара человек смотрят на закат',
+  'Краб в естественной среде на суше',
+  'Фотография концерта',
+  'Бегемот пытается ухватить автомобиль'
+];
+
+const COMMENT_MESSAGES = [
+  'Всё отлично!',
+  'В целом всё неплохо. Но не всё.',
+  'Когда вы делаете фотографию, хорошо бы убирать палец из кадра. В конце концов это просто непрофессионально.',
+  'Моя бабушка случайно чихнула с фотоаппаратом в руках и у неё получилась фотография лучше.',
+  'Я поскользнулся на банановой кожуре и уронил фотоаппарат на кота и у меня получилась фотография лучше.',
+  'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
+];
+
+const USER_NAMES = ['Артём', 'Крокодил Гена', 'ЯнаЯ', 'Батя', 'Yoshi', 'Yla123'];
+
+const getCommentID = createUniqueValueFromRange(COMMENTS_RANGE.MIN, COMMENTS_RANGE.MAX);
 
 const getCommentItem = ()=> {
   const id = getCommentID();
-  const avatar = `img/avatar-${ getRandomPositiveInteger(ranges().AVATAR_RANGE.MIN, ranges().AVATAR_RANGE.MAX) }.svg`;
-  const message = shuffleArray(data().COMMENT_MESSAGES).slice(0, getRandomPositiveInteger(1, 2)).join(' ');
-  const name = data().USER_NAMES[getRandomPositiveInteger(0, data().USER_NAMES.length - 1)];
+  const avatar = `img/avatar-${ getRandomPositiveInteger(AVATAR_RANGE.MIN, AVATAR_RANGE.MAX) }.svg`;
+  const message = shuffleArray(COMMENT_MESSAGES).slice(0, getRandomPositiveInteger(1, 2)).join(' ');
+  const name = USER_NAMES[getRandomPositiveInteger(0, USER_NAMES.length - 1)];
 
   return {
     id,
@@ -18,11 +62,11 @@ const getCommentItem = ()=> {
   };
 };
 
-export const getPhotoItem = (index) => {
+const getPhotoItem = (index) => {
   const url = `photos/${ index + 1 }.jpg`;
-  const description = data().ALTERNATE_TEXTS[index];
-  const likes = getRandomPositiveInteger(ranges().LIKES_RANGE.MIN, ranges().LIKES_RANGE.MAX);
-  const comments = Array.from({ length: getRandomPositiveInteger(ranges().COMMENTS_RANGE.MIN, ranges().COMMENTS_RANGE.MAX) }, getCommentItem);
+  const description = ALTERNATE_TEXTS[index];
+  const likes = getRandomPositiveInteger(LIKES_RANGE.MIN, LIKES_RANGE.MAX);
+  const comments = Array.from({ length: getRandomPositiveInteger(COMMENTS_RANGE.MIN, COMMENTS_RANGE.MAX) }, getCommentItem);
 
   return {
     id: index + 1,
@@ -33,4 +77,12 @@ export const getPhotoItem = (index) => {
   };
 };
 
-export const photos = [];
+const getPhotos = (photoArray, maxPhotoNumber)=> {
+  for (let i = 0; i < maxPhotoNumber; i++) {
+    photoArray.push(getPhotoItem(i));
+  }
+
+  return photoArray;
+};
+
+export { getPhotos };

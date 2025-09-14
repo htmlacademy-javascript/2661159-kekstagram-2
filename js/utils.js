@@ -1,3 +1,8 @@
+const MAX_PHOTO_NUMBER = 25;
+const LIKES_RANGE = { MIN: 15, MAX: 200 };
+const COMMENTS_RANGE = { MIN: 0, MAX: 30 };
+const AVATAR_RANGE = { MIN: 1, MAX: 6 } ;
+
 // Получение рандомного целого числа из диапазона от a до b
 const getRandomPositiveInteger = (a, b) => {
   const lower = Math.ceil(Math.min(Math.abs(a), Math.abs(b)));
@@ -30,4 +35,12 @@ const createUniqueValueFromRange = (min, max) => {
 // Перемешивание массива
 const shuffleArray = (array)=> array.sort(()=> Math.random() - 0.5);
 
-export { getRandomPositiveInteger, createUniqueValueFromRange, shuffleArray };
+export {
+  MAX_PHOTO_NUMBER,
+  LIKES_RANGE,
+  COMMENTS_RANGE,
+  AVATAR_RANGE,
+  getRandomPositiveInteger,
+  createUniqueValueFromRange,
+  shuffleArray
+};
