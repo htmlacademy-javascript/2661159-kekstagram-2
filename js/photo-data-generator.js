@@ -1,7 +1,8 @@
+const LIKES_RANGE = { MIN: 15, MAX: 200 };
+const COMMENTS_RANGE = { MIN: 0, MAX: 30 };
+const AVATAR_RANGE = { MIN: 1, MAX: 6 } ;
+
 import {
-  LIKES_RANGE,
-  COMMENTS_RANGE,
-  AVATAR_RANGE,
   getRandomPositiveInteger,
   createUniqueValueFromRange,
   shuffleArray
