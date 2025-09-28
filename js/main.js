@@ -1,8 +1,4 @@
 import { getPhotos } from './photo-data-generator.js';
+import { renderThumbnails } from './render-thumbnails.js';
 
-const photos = [];
-const MAX_PHOTO_NUMBER = 25;
-
-getPhotos(photos, MAX_PHOTO_NUMBER);
-
-// console.log(photos);
+renderThumbnails(getPhotos());

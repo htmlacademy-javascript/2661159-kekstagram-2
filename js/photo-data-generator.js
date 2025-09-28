@@ -78,12 +78,15 @@ const getPhotoItem = (index) => {
   };
 };
 
-const getPhotos = (photoArray, maxPhotoNumber)=> {
-  for (let i = 0; i < maxPhotoNumber; i++) {
-    photoArray.push(getPhotoItem(i));
+const getPhotos = ()=> {
+  const MAX_PHOTO_NUMBER = 25;
+  const photos = [];
+
+  for (let i = 0; i < MAX_PHOTO_NUMBER; i++) {
+    photos.push(getPhotoItem(i));
   }
 
-  return photoArray;
+  return photos;
 };
 
 export { getPhotos };
