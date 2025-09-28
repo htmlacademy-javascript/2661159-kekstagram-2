@@ -21,8 +21,11 @@ const getThumbnail = (template, data)=> {
   return fragment;
 };
 
-const renderThumbnails = (container, thumbnail)=> {
-  container.append(thumbnail);
+const renderThumbnails = (data)=> {
+  const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
+  const picturesContainer = document.querySelector('.pictures');
+
+  picturesContainer.append(getThumbnail(pictureTemplate, data));
 };
 
-export { getThumbnail, renderThumbnails };
+export { renderThumbnails };
