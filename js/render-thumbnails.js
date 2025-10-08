@@ -10,6 +10,7 @@ const getThumbnail = (template, data)=> {
     };
 
     deepTemplateClone.href = item.url;
+    deepTemplateClone.dataset.photoId = item.id;
     clonedTemplate.img.src = item.url;
     clonedTemplate.img.alt = item.description;
     clonedTemplate.likesCount.textContent = item.likes;
