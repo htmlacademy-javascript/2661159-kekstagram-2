@@ -1,3 +1,7 @@
+import { thumbnailClickHandler } from './render-big-photo.js';
+
+const picturesContainer = document.querySelector('.pictures');
+
 const getThumbnail = (template, data)=> {
   const fragment = document.createDocumentFragment();
 
@@ -24,9 +28,10 @@ const getThumbnail = (template, data)=> {
 
 const renderThumbnails = (data)=> {
   const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
-  const picturesContainer = document.querySelector('.pictures');
 
   picturesContainer.append(getThumbnail(pictureTemplate, data));
+  picturesContainer.addEventListener('click', thumbnailClickHandler(data));
 };
+
 
 export { renderThumbnails };

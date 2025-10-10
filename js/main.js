@@ -1,6 +1,6 @@
-import { photoData } from './photo-data-generator.js';
+import { getPhotos } from './photo-data-generator.js';
 import { renderThumbnails } from './render-thumbnails.js';
-import { picturesContainer, picturesContainerClickHandler } from './render-big-photo.js';
+
+const photoData = getPhotos();
 
 renderThumbnails(photoData);
-picturesContainer.addEventListener('click', picturesContainerClickHandler(photoData));

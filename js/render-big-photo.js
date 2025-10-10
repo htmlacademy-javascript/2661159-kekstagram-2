@@ -1,62 +1,55 @@
 import { body, createEscHandler, removeEscHandler } from './utils.js';
 
-const picturesContainer = document.querySelector('.pictures');
 const bigPictureContainer = document.querySelector('.big-picture');
 const buttonCloseModal = bigPictureContainer.querySelector('.big-picture__cancel');
 
-const buttonCLoseCLickHandler = ()=> {
-  bigPictureContainer.classList.add('hidden');
-  body.classList.remove('modal-open');
-  removeEscHandler();
-};
-
-const getBigPhoto = (data)=> {
-  const fragment = document.createDocumentFragment();
-  const picturePreview = {
-    img: bigPictureContainer.querySelector('.big-picture__img img'),
-    title: bigPictureContainer.querySelector('.social__caption'),
-    likes: bigPictureContainer.querySelector('.likes-count'),
-    comments: bigPictureContainer.querySelector('.social__comments'),
-    commentsCount: bigPictureContainer.querySelector('.social__comment-count'),
-    buttonLoadMoreComments: bigPictureContainer.querySelector('.comments-loader')
-  };
-  const { url, description, likes, comments } = data;
-
-  picturePreview.img.src = url;
-  picturePreview.img.alt = description;
-  picturePreview.title.textContent = description;
-  picturePreview.likes.textContent = likes;
-  picturePreview.commentsCount.classList.add('hidden');
-  picturePreview.buttonLoadMoreComments.classList.add('hidden');
-
-  comments.forEach((comment)=> {
-    const commentElement = document.createElement('li');
-    commentElement.className = 'social__comment';
-
-    const img = document.createElement('img');
-    img.className = 'social__picture';
-    img.src = comment.avatar;
-    img.alt = comment.name;
-    img.width = 35;
-    img.height = 35;
-
-    const text = document.createElement('p');
-    text.className = 'social__text';
-    text.textContent = comment.message;
-
-    commentElement.append(img, text);
-    fragment.appendChild(commentElement);
-  });
-
-  picturePreview.comments.replaceChildren(fragment);
-
-  bigPictureContainer.classList.remove('hidden');
-  if (!body.classList.contains('modal-open')) {
-    body.classList.add('modal-open');
+const overlayClickHandler = (evt)=> {
+  if (evt.target.classList.contains('overlay')) {
+    bigPictureContainer.classList.add('hidden');
+    removeEscHandler();
+    bigPictureContainer.removeEventListener('click', overlayClickHandler);
   }
 };
 
-const picturesContainerClickHandler = (data)=> function (evt) {
+const buttonCloseClickHandler = ()=> {
+  bigPictureContainer.classList.add('hidden');
+  body.classList.remove('modal-open');
+  removeEscHandler();
+  bigPictureContainer.removeEventListener('click', overlayClickHandler);
+};
+
+const getCommentTemplate = (comment)=> `
+  <li class="social__comment">
+    <img
+      class="social__picture"
+      src="${ comment.avatar }"
+      alt="${ comment.name }"
+      width="35" height="35">
+    <p class="social__text">${ comment.message }</p>
+  </li>
+`;
+
+const renderBigPhoto = ({ url, description, likes, comments })=> {
+  const bigPhoto = bigPictureContainer.querySelector('.big-picture__img img');
+  const commentsContainer = bigPictureContainer.querySelector('.social__comments');
+
+  bigPhoto.src = url;
+  bigPhoto.alt = description;
+  bigPictureContainer.querySelector('.social__caption').textContent = description;
+  bigPictureContainer.querySelector('.likes-count').textContent = likes;
+  bigPictureContainer.querySelector('.social__comment-count').classList.add('hidden');
+  bigPictureContainer.querySelector('.comments-loader').classList.add('hidden');
+
+  commentsContainer.innerHTML = '';
+  comments.forEach((comment)=> {
+    commentsContainer.insertAdjacentHTML('beforeend', getCommentTemplate(comment));
+  });
+
+  bigPictureContainer.classList.remove('hidden');
+  body.classList.add('modal-open');
+};
+
+const thumbnailClickHandler = (data)=> function (evt) {
   const currentLink = evt.target.closest('a.picture');
   evt.preventDefault();
 
@@ -65,14 +58,16 @@ const picturesContainerClickHandler = (data)=> function (evt) {
     const photo = data.find((item)=> item.id === currentPhotoID);
 
     if (photo) {
-      getBigPhoto(photo);
+      renderBigPhoto(photo);
     }
   }
 
   createEscHandler(bigPictureContainer, 'hidden', ()=> {
-    buttonCloseModal.removeEventListener('click', buttonCLoseCLickHandler);
+    buttonCloseModal.removeEventListener('click', buttonCloseClickHandler);
+    bigPictureContainer.removeEventListener('click', overlayClickHandler);
   });
-  buttonCloseModal.addEventListener('click', buttonCLoseCLickHandler, { once: true });
+  buttonCloseModal.addEventListener('click', buttonCloseClickHandler, { once: true });
+  bigPictureContainer.addEventListener('click', overlayClickHandler);
 };
 
-export { picturesContainer, picturesContainerClickHandler };
+export { thumbnailClickHandler };

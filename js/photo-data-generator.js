@@ -89,6 +89,4 @@ const getPhotos = ()=> {
   return photos;
 };
 
-const photoData = getPhotos();
-
-export { photoData };
+export { getPhotos };
