@@ -34,7 +34,7 @@ const getCommentTemplate = (comment)=> `
 const renderBigPhoto = ({ url, description, likes, comments })=> {
   const bigPhoto = bigPictureContainer.querySelector('.big-picture__img img');
   const commentsContainer = bigPictureContainer.querySelector('.social__comments');
-  const fragment = document.createDocumentFragment();
+  const commentTemplateHTML = comments.reduce((acc, comment)=> acc + getCommentTemplate(comment), '');
 
   bigPhoto.src = url;
   bigPhoto.alt = description;
@@ -43,15 +43,7 @@ const renderBigPhoto = ({ url, description, likes, comments })=> {
   bigPictureContainer.querySelector('.social__comment-count').classList.add('hidden');
   bigPictureContainer.querySelector('.comments-loader').classList.add('hidden');
 
-  comments.forEach((comment)=> {
-    const commentElement = document.createElement('div');
-
-    commentElement.innerHTML = getCommentTemplate(comment);
-    fragment.appendChild(commentElement.firstElementChild);
-  });
-
-  commentsContainer.innerHTML = '';
-  commentsContainer.appendChild(fragment);
+  commentsContainer.innerHTML = commentTemplateHTML;
 
   bigPictureContainer.classList.remove('hidden');
   body.classList.add('modal-open');
