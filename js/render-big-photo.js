@@ -3,20 +3,22 @@ import { body, createEscHandler, removeEscHandler } from './utils.js';
 const bigPictureContainer = document.querySelector('.big-picture');
 const buttonCloseModal = bigPictureContainer.querySelector('.big-picture__cancel');
 
-const overlayClickHandler = (evt)=> {
+const bigPictureContainerClickHandler = (evt) => {
   if (evt.target.classList.contains('overlay')) {
-    bigPictureContainer.classList.add('hidden');
-    removeEscHandler();
-    bigPictureContainer.removeEventListener('click', overlayClickHandler);
+    closeModal();
   }
 };
 
-const buttonCloseClickHandler = ()=> {
+const buttonCloseModalClickHandler = () => {
+  closeModal();
+};
+
+function closeModal() {
   bigPictureContainer.classList.add('hidden');
   body.classList.remove('modal-open');
   removeEscHandler();
-  bigPictureContainer.removeEventListener('click', overlayClickHandler);
-};
+  bigPictureContainer.removeEventListener('click', bigPictureContainerClickHandler);
+}
 
 const getCommentTemplate = (comment)=> `
   <li class="social__comment">
@@ -32,6 +34,7 @@ const getCommentTemplate = (comment)=> `
 const renderBigPhoto = ({ url, description, likes, comments })=> {
   const bigPhoto = bigPictureContainer.querySelector('.big-picture__img img');
   const commentsContainer = bigPictureContainer.querySelector('.social__comments');
+  const fragment = document.createDocumentFragment();
 
   bigPhoto.src = url;
   bigPhoto.alt = description;
@@ -40,10 +43,15 @@ const renderBigPhoto = ({ url, description, likes, comments })=> {
   bigPictureContainer.querySelector('.social__comment-count').classList.add('hidden');
   bigPictureContainer.querySelector('.comments-loader').classList.add('hidden');
 
-  commentsContainer.innerHTML = '';
   comments.forEach((comment)=> {
-    commentsContainer.insertAdjacentHTML('beforeend', getCommentTemplate(comment));
+    const commentElement = document.createElement('div');
+
+    commentElement.innerHTML = getCommentTemplate(comment);
+    fragment.appendChild(commentElement.firstElementChild);
   });
+
+  commentsContainer.innerHTML = '';
+  commentsContainer.appendChild(fragment);
 
   bigPictureContainer.classList.remove('hidden');
   body.classList.add('modal-open');
@@ -63,11 +71,11 @@ const thumbnailClickHandler = (data)=> function (evt) {
   }
 
   createEscHandler(bigPictureContainer, 'hidden', ()=> {
-    buttonCloseModal.removeEventListener('click', buttonCloseClickHandler);
-    bigPictureContainer.removeEventListener('click', overlayClickHandler);
+    buttonCloseModal.removeEventListener('click', buttonCloseModalClickHandler);
+    bigPictureContainer.removeEventListener('click', bigPictureContainerClickHandler);
   });
-  buttonCloseModal.addEventListener('click', buttonCloseClickHandler, { once: true });
-  bigPictureContainer.addEventListener('click', overlayClickHandler);
+  buttonCloseModal.addEventListener('click', buttonCloseModalClickHandler, { once: true });
+  bigPictureContainer.addEventListener('click', bigPictureContainerClickHandler);
 };
 
 export { thumbnailClickHandler };
