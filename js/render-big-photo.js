@@ -100,10 +100,10 @@ const thumbnailClickHandler = (data)=> function (evt) {
   createEscHandler(bigPictureContainer, 'hidden', ()=> {
     buttonCloseModal.removeEventListener('click', buttonCloseModalClickHandler);
     bigPictureContainer.removeEventListener('click', bigPictureContainerClickHandler);
+    buttonLoadMore.removeEventListener('click', loadMoreComments);
   });
   buttonCloseModal.addEventListener('click', buttonCloseModalClickHandler, { once: true });
   bigPictureContainer.addEventListener('click', bigPictureContainerClickHandler);
-  buttonLoadMore.removeEventListener('click', loadMoreComments);
 };
 
 export { thumbnailClickHandler };
