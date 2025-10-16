@@ -80,9 +80,9 @@ const renderBigPhoto = ({ url, description, likes, comments })=> {
 
 const thumbnailClickHandler = (data)=> function (evt) {
   const currentLink = evt.target.closest('a.picture');
-  evt.preventDefault();
 
   if (currentLink) {
+    evt.preventDefault();
     const currentPhotoID = +currentLink.dataset.photoId;
     const photo = data.find((item)=> item.id === currentPhotoID);
 
