@@ -1,4 +1,4 @@
-import { body, createEscHandler, removeEscHandler } from './utils.js';
+import { body } from './utils.js';
 
 const COMMENTS_SHOWN = 5;
 const bigPictureContainer = document.querySelector('.big-picture');
@@ -37,10 +37,19 @@ const buttonCloseModalClickHandler = () => {
   closeModal();
 };
 
+const EscPressHandler = (evt)=> {
+  if (evt.key === 'Escape') {
+    bigPictureContainer.classList.add('hidden');
+    buttonCloseModal.removeEventListener('click', buttonCloseModalClickHandler);
+    bigPictureContainer.removeEventListener('click', bigPictureContainerClickHandler);
+    buttonLoadMore.removeEventListener('click', buttonLoadMoreClickHandler);
+    currentDisplayedCount = COMMENTS_SHOWN;
+  }
+};
+
 function closeModal() {
   bigPictureContainer.classList.add('hidden');
   body.classList.remove('modal-open');
-  removeEscHandler();
   bigPictureContainer.removeEventListener('click', bigPictureContainerClickHandler);
   buttonLoadMore.removeEventListener('click', buttonLoadMoreClickHandler);
   currentDisplayedCount = COMMENTS_SHOWN;
@@ -91,15 +100,11 @@ const thumbnailClickHandler = (data)=> function (evt) {
     }
   }
 
-  createEscHandler(bigPictureContainer, 'hidden', ()=> {
-    buttonCloseModal.removeEventListener('click', buttonCloseModalClickHandler);
-    bigPictureContainer.removeEventListener('click', bigPictureContainerClickHandler);
-    buttonLoadMore.removeEventListener('click', buttonLoadMoreClickHandler);
-    currentDisplayedCount = COMMENTS_SHOWN;
-  });
   buttonCloseModal.addEventListener('click', buttonCloseModalClickHandler, { once: true });
   bigPictureContainer.addEventListener('click', bigPictureContainerClickHandler);
   buttonLoadMore.addEventListener('click', buttonLoadMoreClickHandler);
 };
+
+document.addEventListener('keydown', EscPressHandler);
 
 export { thumbnailClickHandler };
