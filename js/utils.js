@@ -32,44 +32,30 @@ const createUniqueValueFromRange = (min, max) => {
 // Перемешивание массива
 const shuffleArray = (array)=> array.sort(()=> Math.random() - 0.5);
 
-// Закрытие по ESC
-// eslint-disable-next-line prefer-const
-let activeHandler = null;
-const removeEscHandler = () => {
-  if (activeHandler) {
-    document.removeEventListener('keydown', activeHandler);
-    activeHandler = null;
+// Склонение слова после числа
+const pluralize = (num, declensions) => {
+  const n = Math.abs(num) % 100;
+  const n1 = n % 10;
+
+  if (n > 10 && n < 20) {
+    return declensions[2];
   }
+
+  if (n1 > 1 && n1 < 5) {
+    return declensions[1];
+  }
+
+  if (n1 === 1) {
+    return declensions[0];
+  }
+
+  return declensions[2];
 };
-
-const createEscHandler = (element, cssClassName, cb) => {
-  removeEscHandler();
-
-  const handler = (evt) => {
-    if (evt.key === 'Escape') {
-      evt.preventDefault();
-      element.classList.add(cssClassName);
-      removeEscHandler();
-      if (body.classList.contains('modal-open')) {
-        body.classList.remove('modal-open');
-      }
-
-      if (cb) {
-        cb();
-      }
-    }
-  };
-
-  document.addEventListener('keydown', handler);
-  activeHandler = handler;
-};
-
 
 export {
   body,
   getRandomPositiveInteger,
   createUniqueValueFromRange,
   shuffleArray,
-  createEscHandler,
-  removeEscHandler
+  pluralize
 };
