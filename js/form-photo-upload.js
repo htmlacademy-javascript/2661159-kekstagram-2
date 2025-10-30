@@ -1,4 +1,4 @@
-import { body, pluralize } from '../utils.js';
+import { body, pluralize } from './utils.js';
 
 const COMMENT_MAX_CHAR_NUMBER = 140;
 const MAX_HASHTAG_COUNT = 5;
@@ -161,9 +161,8 @@ function closeModal() {
 }
 
 document.addEventListener('keydown', EscPressHandler);
-imgUpload.control.addEventListener('change', imgUploadControlChangeHandler);
 imgUpload.hashTagField.addEventListener('input', inputHandler);
 imgUpload.commentField.addEventListener('input', inputHandler);
 imgUpload.form.addEventListener('submit', formSubmitHandler);
 
-export { imgUploadControlChangeHandler };
+export { imgUpload, imgUploadControlChangeHandler };
