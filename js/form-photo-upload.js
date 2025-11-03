@@ -4,28 +4,24 @@ const COMMENT_MAX_CHAR_NUMBER = 140;
 const MAX_HASHTAG_COUNT = 5;
 const HASHTAG_WORD_DECLENSIONS = ['хэштег', 'хэштега', 'хэштегов'];
 const SYMBOL_WORD_DECLENSIONS = ['символ', 'символ', 'символов'];
-const hashTagCharactersNumber = {
-  MIN: 2,
-  MAX: 20
-};
-const hashTagRegExp = /^#[a-zA-Zа-яА-ЯёЁ0-9]{1,19}$/;
+const HASHTAG_MIN_CHARACTERS_NUMBER = 2;
+const HASHTAG_MAX_CHARACTERS_NUMBER = 20;
+const HASHTAG_REG_EXP = /^#[a-zA-Zа-яА-ЯёЁ0-9]{1,19}$/;
+const DEFAULT_IMG_URL = 'img/upload-default-image.jpg';
 
 const imgUploadContainer = document.querySelector('.img-upload');
-const imgUpload = {
-  defaultURL: 'img/upload-default-image.jpg',
-  form: imgUploadContainer.querySelector('#upload-select-image'),
-  hashTagField: imgUploadContainer.querySelector('.text__hashtags'),
-  commentField: imgUploadContainer.querySelector('.text__description'),
-  control: imgUploadContainer.querySelector('#upload-file'),
-  overlay: imgUploadContainer.querySelector('.img-upload__overlay'),
-  buttonCloseModal: imgUploadContainer.querySelector('#upload-cancel'),
-  buttonFormSubmit: imgUploadContainer.querySelector('#upload-submit'),
-  preview: imgUploadContainer.querySelector('.img-upload__preview img'),
-  previewEffectThumbnails: imgUploadContainer.querySelectorAll('.effects__preview')
-};
+const uploadForm = imgUploadContainer.querySelector('#upload-select-image');
+const uploadFormHashTagField = imgUploadContainer.querySelector('.text__hashtags');
+const uploadFormCommentField = imgUploadContainer.querySelector('.text__description');
+const uploadFileControl = imgUploadContainer.querySelector('#upload-file');
+const uploadOverlay = imgUploadContainer.querySelector('.img-upload__overlay');
+const uploadButtonModalClose = imgUploadContainer.querySelector('#upload-cancel');
+const uploadButtonFormSubmit = imgUploadContainer.querySelector('#upload-submit');
+const uploadImagePreview = imgUploadContainer.querySelector('.img-upload__preview img');
+const uploadImagePreviewEffectThumbnails = imgUploadContainer.querySelectorAll('.effects__preview');
 
 let hashTagErrorMessage = '';
-const errorHashTagString = () => hashTagErrorMessage;
+const getHashTagErrorString = () => hashTagErrorMessage;
 
 const getHashTag = (value) => value.trim().toLowerCase().split(/\s+/);
 
@@ -35,12 +31,12 @@ const pristineConfig = {
   errorTextParent: 'img-upload__field-wrapper',
 };
 
-const pristineInstance = new Pristine(imgUpload.form, pristineConfig);
+const pristineInstance = new Pristine(uploadForm, pristineConfig);
 
 const getFileURL = ()=> {
-  const file = imgUpload.control.files[0];
+  const file = uploadFileControl.files[0];
 
-  return file ? URL.createObjectURL(file) : imgUpload.defaultURL;
+  return file ? URL.createObjectURL(file) : DEFAULT_IMG_URL;
 };
 
 const isCommentValid = (value)=> value.trim().length <= COMMENT_MAX_CHAR_NUMBER;
@@ -53,11 +49,11 @@ const isHashTagValid = (value)=> {
       error: 'Хэштеги должны начинаться с #'
     },
     {
-      check: (item) => item.length < hashTagCharactersNumber.MIN || item.length > hashTagCharactersNumber.MAX,
-      error: `Хэштег должен быть длиной от ${ hashTagCharactersNumber.MIN } до ${ hashTagCharactersNumber.MAX } ${ pluralize(hashTagCharactersNumber.MAX, SYMBOL_WORD_DECLENSIONS) }`
+      check: (item) => item.length < HASHTAG_MIN_CHARACTERS_NUMBER || item.length > HASHTAG_MAX_CHARACTERS_NUMBER,
+      error: `Хэштег должен быть длиной от ${ HASHTAG_MIN_CHARACTERS_NUMBER } до ${ HASHTAG_MAX_CHARACTERS_NUMBER } ${ pluralize(HASHTAG_MAX_CHARACTERS_NUMBER, SYMBOL_WORD_DECLENSIONS) }`
     },
     {
-      check: (item) => !hashTagRegExp.test(item),
+      check: (item) => !HASHTAG_REG_EXP.test(item),
       error: 'Хэштег содержит недопустимые символы'
     },
     {
@@ -88,15 +84,15 @@ const isHashTagValid = (value)=> {
 };
 
 pristineInstance.addValidator(
-  imgUpload.hashTagField,
+  uploadFormHashTagField,
   isHashTagValid,
-  errorHashTagString,
+  getHashTagErrorString,
   2,
   false
 );
 
 pristineInstance.addValidator(
-  imgUpload.commentField,
+  uploadFormCommentField,
   isCommentValid,
   `Комментарий не должен превышать ${ COMMENT_MAX_CHAR_NUMBER } символов`,
   2,
@@ -107,11 +103,10 @@ const formSubmitHandler = (evt)=> {
   evt.preventDefault();
   const isValid = pristineInstance.validate();
 
-  if (!isValid) {
-    imgUpload.buttonFormSubmit.disabled = true;
-  } else {
-    imgUpload.buttonFormSubmit.disabled = false;
-    imgUpload.form.submit();
+  uploadButtonFormSubmit.disabled = !isValid;
+
+  if (isValid) {
+    uploadForm.submit();
   }
 };
 
@@ -125,44 +120,47 @@ const imgUploadOverlayClickHandler = (evt) => {
   }
 };
 
-const EscPressHandler = (evt)=> {
-  if (evt.key === 'Escape' && document.activeElement !== imgUpload.commentField) {
-    imgUpload.overlay.classList.add('hidden');
-    imgUpload.preview.src = imgUpload.defaultURL;
+const documentPressEscHandler = (evt)=> {
+  if (evt.key === 'Escape' && document.activeElement !== uploadFormCommentField) {
+    uploadOverlay.classList.add('hidden');
+    uploadImagePreview.src = DEFAULT_IMG_URL;
     body.classList.remove('modal-open');
   }
 };
 
 const imgUploadControlChangeHandler = ()=> {
-  imgUpload.overlay.classList.remove('hidden');
+  uploadOverlay.classList.remove('hidden');
   body.classList.add('modal-open');
-  imgUpload.preview.src = `${ getFileURL() }`;
-  imgUpload.previewEffectThumbnails.forEach((thumbnail)=> {
+  uploadImagePreview.src = `${ getFileURL() }`;
+  uploadImagePreviewEffectThumbnails.forEach((thumbnail)=> {
     thumbnail.style.backgroundImage = `url(${ getFileURL() })`;
   });
 
-  imgUpload.buttonCloseModal.addEventListener('click', imgUploadButtonCloseModalClickHandler, { once: true });
-  imgUpload.overlay.addEventListener('click', imgUploadOverlayClickHandler);
+  uploadButtonModalClose.addEventListener('click', imgUploadButtonCloseModalClickHandler, { once: true });
+  uploadOverlay.addEventListener('click', imgUploadOverlayClickHandler);
 };
 
-const inputHandler = ()=> {
-  imgUpload.buttonFormSubmit.disabled = !pristineInstance.validate();
+const hashTagFieldInputHandler = ()=> {
+  uploadButtonFormSubmit.disabled = !pristineInstance.validate();
+};
+
+const commentFieldInputHandler = ()=> {
+  uploadButtonFormSubmit.disabled = !pristineInstance.validate();
 };
 
 function closeModal() {
   pristineInstance.reset();
-  imgUpload.overlay.classList.add('hidden');
+  uploadOverlay.classList.add('hidden');
   body.classList.remove('modal-open');
-  imgUpload.preview.src = imgUpload.defaultURL;
-  imgUpload.commentField.value = '';
-  imgUpload.hashTagField.value = '';
-  imgUpload.buttonCloseModal.removeEventListener('click', imgUploadButtonCloseModalClickHandler);
-  imgUpload.overlay.removeEventListener('click', imgUploadOverlayClickHandler);
+  uploadImagePreview.src = DEFAULT_IMG_URL;
+  uploadFormCommentField.value = '';
+  uploadFormHashTagField.value = '';
+  uploadButtonModalClose.removeEventListener('click', imgUploadButtonCloseModalClickHandler);
+  uploadOverlay.removeEventListener('click', imgUploadOverlayClickHandler);
 }
 
-document.addEventListener('keydown', EscPressHandler);
-imgUpload.hashTagField.addEventListener('input', inputHandler);
-imgUpload.commentField.addEventListener('input', inputHandler);
-imgUpload.form.addEventListener('submit', formSubmitHandler);
-
-export { imgUpload, imgUploadControlChangeHandler };
+document.addEventListener('keydown', documentPressEscHandler);
+uploadFormHashTagField.addEventListener('input', hashTagFieldInputHandler);
+uploadFormCommentField.addEventListener('input', commentFieldInputHandler);
+uploadForm.addEventListener('submit', formSubmitHandler);
+uploadFileControl.addEventListener('change', imgUploadControlChangeHandler);
