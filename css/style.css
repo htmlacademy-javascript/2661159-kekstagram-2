@@ -556,6 +556,9 @@ main {
 
 .effect-level .noUi-connects {
   border-radius: 13px;
+}
+
+.effect-level .noUi-connect {
   background: #ffe753;
 }
 
