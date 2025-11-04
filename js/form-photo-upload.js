@@ -16,7 +16,7 @@ const uploadFormCommentField = imgUploadContainer.querySelector('.text__descript
 const uploadFileControl = imgUploadContainer.querySelector('#upload-file');
 const uploadOverlay = imgUploadContainer.querySelector('.img-upload__overlay');
 const uploadButtonModalClose = imgUploadContainer.querySelector('#upload-cancel');
-const uploadButtonFormSubmit = imgUploadContainer.querySelector('#upload-submit');
+const uploadFormButtonSubmit = imgUploadContainer.querySelector('#upload-submit');
 const uploadImagePreview = imgUploadContainer.querySelector('.img-upload__preview img');
 const uploadImagePreviewEffectThumbnails = imgUploadContainer.querySelectorAll('.effects__preview');
 
@@ -83,6 +83,10 @@ const isHashTagValid = (value)=> {
   );
 };
 
+const updateStateUploadFormButtonSubmit = ()=> {
+  uploadFormButtonSubmit.disabled = !pristineInstance.validate();
+};
+
 pristineInstance.addValidator(
   uploadFormHashTagField,
   isHashTagValid,
@@ -103,7 +107,7 @@ const uploadFormSubmitHandler = (evt)=> {
   evt.preventDefault();
   const isValid = pristineInstance.validate();
 
-  uploadButtonFormSubmit.disabled = !isValid;
+  uploadFormButtonSubmit.disabled = !isValid;
 
   if (isValid) {
     uploadForm.submit();
@@ -120,15 +124,18 @@ const imgUploadOverlayClickHandler = (evt) => {
   }
 };
 
-const documentPressEscHandler = (evt)=> {
-  if (evt.key === 'Escape' && document.activeElement !== uploadFormCommentField) {
-    uploadOverlay.classList.add('hidden');
-    uploadImagePreview.src = DEFAULT_IMG_URL;
-    uploadFormCommentField.value = '';
-    uploadFormHashTagField.value = '';
-    uploadFileControl.value = '';
-    body.classList.remove('modal-open');
+const documentKeydownHandler = (evt)=> {
+  if (evt.key === 'Escape' && document.activeElement !== uploadFormHashTagField && document.activeElement !== uploadFormCommentField) {
+    closeModal();
   }
+};
+
+const hashTagFieldInputHandler = ()=> {
+  updateStateUploadFormButtonSubmit();
+};
+
+const commentFieldInputHandler = ()=> {
+  updateStateUploadFormButtonSubmit();
 };
 
 const uploadFileControlChangeHandler = ()=> {
@@ -139,16 +146,12 @@ const uploadFileControlChangeHandler = ()=> {
     thumbnail.style.backgroundImage = `url(${ getFileURL() })`;
   });
 
+  document.addEventListener('keydown', documentKeydownHandler);
+  uploadFormHashTagField.addEventListener('input', hashTagFieldInputHandler);
+  uploadFormCommentField.addEventListener('input', commentFieldInputHandler);
+  uploadForm.addEventListener('submit', uploadFormSubmitHandler);
   uploadButtonModalClose.addEventListener('click', imgUploadButtonCloseModalClickHandler, { once: true });
   uploadOverlay.addEventListener('click', imgUploadOverlayClickHandler);
-};
-
-const hashTagFieldInputHandler = ()=> {
-  uploadButtonFormSubmit.disabled = !pristineInstance.validate();
-};
-
-const commentFieldInputHandler = ()=> {
-  uploadButtonFormSubmit.disabled = !pristineInstance.validate();
 };
 
 function closeModal() {
@@ -159,12 +162,13 @@ function closeModal() {
   uploadFormCommentField.value = '';
   uploadFormHashTagField.value = '';
   uploadFileControl.value = '';
+
+  document.removeEventListener('keydown', documentKeydownHandler);
+  uploadFormHashTagField.removeEventListener('input', hashTagFieldInputHandler);
+  uploadFormCommentField.removeEventListener('input', commentFieldInputHandler);
   uploadButtonModalClose.removeEventListener('click', imgUploadButtonCloseModalClickHandler);
+  uploadForm.removeEventListener('submit', uploadFormSubmitHandler);
   uploadOverlay.removeEventListener('click', imgUploadOverlayClickHandler);
 }
 
-document.addEventListener('keydown', documentPressEscHandler);
-uploadFormHashTagField.addEventListener('input', hashTagFieldInputHandler);
-uploadFormCommentField.addEventListener('input', commentFieldInputHandler);
-uploadForm.addEventListener('submit', uploadFormSubmitHandler);
 uploadFileControl.addEventListener('change', uploadFileControlChangeHandler);
