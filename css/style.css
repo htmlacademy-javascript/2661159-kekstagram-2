@@ -752,6 +752,7 @@ main {
 
 .img-upload__submit:disabled,
 .img-upload__submit--disabled {
+  pointer-events: none;
   opacity: 0.3;
 }
 
