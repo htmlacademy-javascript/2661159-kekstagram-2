@@ -8,6 +8,14 @@ const HASHTAG_MIN_CHARACTERS_NUMBER = 2;
 const HASHTAG_MAX_CHARACTERS_NUMBER = 20;
 const HASHTAG_REG_EXP = /^#[a-zA-Zа-яА-ЯёЁ0-9]{1,19}$/;
 const DEFAULT_IMG_URL = 'img/upload-default-image.jpg';
+const EFFECT_CONFIGS = {
+  chrome: { filter: 'grayscale', start: 1, min: 0, max: 1, step: 0.1, unit: '' },
+  sepia: { filter: 'sepia', start: 1, min: 0, max: 1, step: 0.1, unit: '' },
+  marvin: { filter: 'invert', start: 100, min: 0, max: 100, step: 1, unit: '%' },
+  phobos: { filter: 'blur', start: 3, min: 0, max: 3, step: 0.1, unit: 'px' },
+  heat: { filter: 'brightness', start: 3, min: 1, max: 3, step: 0.1, unit: '' },
+  none: { filter: '', start: 1, min: 0, max: 1, step: 0.1, unit: '' }
+};
 
 const imgUploadContainer = document.querySelector('.img-upload');
 const uploadForm = imgUploadContainer.querySelector('#upload-select-image');
@@ -19,7 +27,7 @@ const uploadButtonModalClose = imgUploadContainer.querySelector('#upload-cancel'
 const uploadFormButtonSubmit = imgUploadContainer.querySelector('#upload-submit');
 const uploadImagePreview = imgUploadContainer.querySelector('.img-upload__preview img');
 const uploadImagePreviewEffectThumbnails = imgUploadContainer.querySelectorAll('.effects__preview');
-const uploadImagePreviewSliderValue = imgUploadContainer.querySelector('.effect-level__value');
+const uploadImagePreviewSliderControl = imgUploadContainer.querySelector('.effect-level__value');
 const uploadImagePreviewEffectSlider = imgUploadContainer.querySelector('.effect-level__slider');
 
 let hashTagErrorMessage = '';
@@ -117,95 +125,45 @@ const noUiSliderConfig = {
 
 noUiSlider.create(uploadImagePreviewEffectSlider, noUiSliderConfig);
 
-const updateFilterEffect = (sliderInstance, sliderConfig, preview, sliderValue, cssFilter, cssUnits = '')=> {
-  sliderInstance.noUiSlider.updateOptions(sliderConfig);
-  sliderInstance.noUiSlider.on('update', () => {
-    preview.style.filter = `${ cssFilter }(${ sliderInstance.noUiSlider.get() }${ cssUnits })`;
-    sliderValue.value = sliderInstance.noUiSlider.get();
-  });
+uploadImagePreviewEffectSlider.parentNode.hidden = true;
+
+const hideSlider = (evt)=> {
+  const sliderContainer = uploadImagePreviewEffectSlider.parentNode;
+  const effectPreview = evt.target.closest('.effects__preview');
+
+  if (effectPreview) {
+    const isNoneEffect = effectPreview.classList.contains('effects__preview--none');
+
+    sliderContainer.hidden = isNoneEffect;
+  }
+
+  return false;
 };
 
 const setFilterEffect = (evt)=> {
+  hideSlider(evt);
   if (evt.target.classList.contains('effects__preview')) {
-    // eslint-disable-next-line prefer-const
-    let effectString = evt.target.className.split('--')[1];
+    const effectString = evt.target.className.split('--')[1];
+    const config = EFFECT_CONFIGS[effectString];
 
     uploadImagePreviewEffectSlider.noUiSlider.off('update');
 
-    switch (effectString) {
-      case 'chrome':
-        updateFilterEffect(
-          uploadImagePreviewEffectSlider,
-          noUiSliderConfig,
-          uploadImagePreview,
-          uploadImagePreviewSliderValue,
-          'grayscale'
-        );
-        break;
+    uploadImagePreviewEffectSlider.noUiSlider.updateOptions({
+      start: config.start,
+      range: {
+        min: config.min,
+        max: config.max
+      },
+      step: config.step,
+      connect: 'lower'
+    });
 
-      case 'sepia':
-        updateFilterEffect(
-          uploadImagePreviewEffectSlider,
-          noUiSliderConfig,
-          uploadImagePreview,
-          uploadImagePreviewSliderValue,
-          'sepia'
-        );
-        break;
+    uploadImagePreviewEffectSlider.noUiSlider.on('update', () => {
+      const value = uploadImagePreviewEffectSlider.noUiSlider.get();
 
-      case 'marvin':
-        updateFilterEffect(
-          uploadImagePreviewEffectSlider,
-          {
-            start: 100,
-            range: { min: 0, max: 100 },
-            step: 1
-          },
-          uploadImagePreview,
-          uploadImagePreviewSliderValue,
-          'invert',
-          '%'
-        );
-        break;
-
-      case 'phobos':
-        updateFilterEffect(
-          uploadImagePreviewEffectSlider,
-          {
-            start: 3,
-            range: { min: 0, max: 3 },
-            step: 0.1
-          },
-          uploadImagePreview,
-          uploadImagePreviewSliderValue,
-          'blur',
-          'px'
-        );
-        break;
-
-      case 'heat':
-        updateFilterEffect(
-          uploadImagePreviewEffectSlider,
-          {
-            start: 3,
-            range: { min: 1, max: 3 },
-            step: 0.1
-          },
-          uploadImagePreview,
-          uploadImagePreviewSliderValue,
-          'brightness'
-        );
-        break;
-
-      default:
-        updateFilterEffect(
-          uploadImagePreviewEffectSlider,
-          noUiSliderConfig,
-          uploadImagePreview,
-          uploadImagePreviewSliderValue,
-          ''
-        );
-    }
+      uploadImagePreview.style.filter = config.filter ? `${config.filter}(${value}${config.unit})` : '';
+      uploadImagePreviewSliderControl.value = value;
+    });
   }
 };
 
