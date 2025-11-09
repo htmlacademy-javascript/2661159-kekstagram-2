@@ -8,6 +8,7 @@ const HASHTAG_MIN_CHARACTERS_NUMBER = 2;
 const HASHTAG_MAX_CHARACTERS_NUMBER = 20;
 const HASHTAG_REG_EXP = /^#[a-zA-Zа-яА-ЯёЁ0-9]{1,19}$/;
 const DEFAULT_IMG_URL = 'img/upload-default-image.jpg';
+
 const EFFECT_CONFIGS = {
   chrome: { filter: 'grayscale', start: 1, min: 0, max: 1, step: 0.1, unit: '' },
   sepia: { filter: 'sepia', start: 1, min: 0, max: 1, step: 0.1, unit: '' },
@@ -16,6 +17,10 @@ const EFFECT_CONFIGS = {
   heat: { filter: 'brightness', start: 3, min: 1, max: 3, step: 0.1, unit: '' },
   none: { filter: '', start: 1, min: 0, max: 1, step: 0.1, unit: '' }
 };
+
+const SCALING_STEP_VALUE = 25;
+const SCALING_VALUE_MIN = 25;
+const SCALING_VALUE_MAX = 100;
 
 const imgUploadContainer = document.querySelector('.img-upload');
 const uploadForm = imgUploadContainer.querySelector('#upload-select-image');
@@ -30,6 +35,11 @@ const uploadImagePreviewEffectThumbnails = imgUploadContainer.querySelectorAll('
 const uploadImagePreviewSliderControl = imgUploadContainer.querySelector('.effect-level__value');
 const uploadImagePreviewEffectSlider = imgUploadContainer.querySelector('.effect-level__slider');
 
+const uploadImageScale = imgUploadContainer.querySelector('.scale');
+const uploadImageScaleInput = uploadImageScale.querySelector('.scale__control--value');
+
+
+// Проверка полей 'комментарий' и 'хэштеги'
 let hashTagErrorMessage = '';
 const getHashTagErrorString = () => hashTagErrorMessage;
 
@@ -113,6 +123,8 @@ pristineInstance.addValidator(
   false
 );
 
+
+// Наложение эффекта на изображение
 const noUiSliderConfig = {
   start: 1,
   range: {
@@ -167,6 +179,26 @@ const setFilterEffect = (evt)=> {
   }
 };
 
+const changeImagePreviewSize = (evt)=> {
+  let sizeValue = +uploadImageScaleInput.value.slice(0, -1);
+
+
+  if (evt.target.classList.contains('scale__control--smaller')) {
+    if (sizeValue > SCALING_VALUE_MIN) {
+      sizeValue -= SCALING_STEP_VALUE;
+    }
+  } else if (evt.target.classList.contains('scale__control--bigger')) {
+    if (sizeValue < SCALING_VALUE_MAX) {
+      sizeValue += SCALING_STEP_VALUE;
+    }
+  }
+
+  uploadImageScaleInput.value = `${ sizeValue }%`;
+  uploadImagePreview.style.transform = `scale(${ sizeValue / 100 })`;
+};
+
+
+// Функции-обработчики
 const uploadFormSubmitHandler = (evt)=> {
   evt.preventDefault();
   const isValid = pristineInstance.validate();
@@ -217,6 +249,7 @@ const uploadFileControlChangeHandler = ()=> {
   uploadButtonModalClose.addEventListener('click', imgUploadButtonCloseModalClickHandler, { once: true });
   uploadOverlay.addEventListener('click', imgUploadOverlayClickHandler);
   imgUploadContainer.addEventListener('click', setFilterEffect);
+  uploadImageScale.addEventListener('click', changeImagePreviewSize);
 };
 
 function closeModal() {
@@ -234,6 +267,7 @@ function closeModal() {
   uploadButtonModalClose.removeEventListener('click', imgUploadButtonCloseModalClickHandler);
   uploadForm.removeEventListener('submit', uploadFormSubmitHandler);
   uploadOverlay.removeEventListener('click', imgUploadOverlayClickHandler);
+  uploadImageScale.removeEventListener('click', changeImagePreviewSize);
 }
 
 uploadFileControl.addEventListener('change', uploadFileControlChangeHandler);
