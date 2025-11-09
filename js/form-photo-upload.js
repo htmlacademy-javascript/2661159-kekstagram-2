@@ -262,8 +262,6 @@ const uploadFileControlChangeHandler = ()=> {
 };
 
 const resetFilters = ()=> {
-  const radioInputNoneEffect = imgUploadContainer.querySelector('.effects__radio');
-
   uploadImagePreviewEffectSlider.noUiSlider.updateOptions({
     start: EFFECT_CONFIGS.none.start,
     range: { min: EFFECT_CONFIGS.none.min, max: EFFECT_CONFIGS.none.max },
@@ -272,11 +270,6 @@ const resetFilters = ()=> {
 
   uploadImagePreviewEffectSlider.noUiSlider.set(EFFECT_CONFIGS.none.start);
   uploadImagePreviewEffectSlider.parentNode.hidden = true;
-
-  imgUploadContainer.querySelectorAll('.effects__radio').forEach((radioInput)=> {
-    radioInput.checked = false;
-    radioInputNoneEffect.checked = true;
-  });
 };
 
 const resetScaling = ()=> {
@@ -292,9 +285,7 @@ function closeModal() {
   uploadOverlay.classList.add('hidden');
   body.classList.remove('modal-open');
   uploadImagePreview.src = DEFAULT_IMG_URL;
-  uploadFormCommentField.value = '';
-  uploadFormHashTagField.value = '';
-  uploadFileControl.value = '';
+  uploadForm.reset();
 
   resetFilters();
   resetScaling();
