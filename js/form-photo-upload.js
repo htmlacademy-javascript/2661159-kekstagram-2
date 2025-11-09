@@ -8,6 +8,7 @@ const HASHTAG_MIN_CHARACTERS_NUMBER = 2;
 const HASHTAG_MAX_CHARACTERS_NUMBER = 20;
 const HASHTAG_REG_EXP = /^#[a-zA-Zа-яА-ЯёЁ0-9]{1,19}$/;
 const DEFAULT_IMG_URL = 'img/upload-default-image.jpg';
+const ALLOWED_FILES_FORMATS = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/svg', 'image/webp'];
 
 const EFFECT_CONFIGS = {
   chrome: { filter: 'grayscale', start: 1, min: 0, max: 1, step: 0.1, unit: '' },
@@ -55,6 +56,11 @@ const pristineInstance = new Pristine(uploadForm, pristineConfig);
 
 const getFileURL = ()=> {
   const file = uploadFileControl.files[0];
+
+  if (file && !ALLOWED_FILES_FORMATS.includes(file.type)) {
+    uploadFileControl.value = '';
+    return DEFAULT_IMG_URL;
+  }
 
   return file ? URL.createObjectURL(file) : DEFAULT_IMG_URL;
 };
@@ -152,7 +158,8 @@ const hideSlider = (evt)=> {
   return false;
 };
 
-const setFilterEffect = (evt)=> {
+// Функция установки эффекта фильтра
+const imgUploadContainerClickHandler = (evt)=> {
   hideSlider(evt);
   if (evt.target.classList.contains('effects__preview')) {
     const effectString = evt.target.className.split('--')[1];
@@ -179,7 +186,8 @@ const setFilterEffect = (evt)=> {
   }
 };
 
-const changeImagePreviewSize = (evt)=> {
+// Функция изменения масштаба изображения
+const uploadImageScaleClickHandler = (evt)=> {
   let sizeValue = +uploadImageScaleInput.value.slice(0, -1);
 
 
@@ -248,8 +256,8 @@ const uploadFileControlChangeHandler = ()=> {
   uploadForm.addEventListener('submit', uploadFormSubmitHandler);
   uploadButtonModalClose.addEventListener('click', imgUploadButtonCloseModalClickHandler, { once: true });
   uploadOverlay.addEventListener('click', imgUploadOverlayClickHandler);
-  imgUploadContainer.addEventListener('click', setFilterEffect);
-  uploadImageScale.addEventListener('click', changeImagePreviewSize);
+  imgUploadContainer.addEventListener('click', imgUploadContainerClickHandler);
+  uploadImageScale.addEventListener('click', uploadImageScaleClickHandler);
 };
 
 function closeModal() {
@@ -261,13 +269,24 @@ function closeModal() {
   uploadFormHashTagField.value = '';
   uploadFileControl.value = '';
 
+  uploadImagePreview.style.filter = '';
+  uploadImagePreviewSliderControl.value = '';
+
+  uploadImagePreviewEffectSlider.noUiSlider.updateOptions({
+    start: EFFECT_CONFIGS.none.start,
+    range: { min: EFFECT_CONFIGS.none.min, max: EFFECT_CONFIGS.none.max },
+    step: EFFECT_CONFIGS.none.step
+  });
+  uploadImagePreviewEffectSlider.noUiSlider.set(EFFECT_CONFIGS.none.start);
+
   document.removeEventListener('keydown', documentKeydownHandler);
   uploadFormHashTagField.removeEventListener('input', hashTagFieldInputHandler);
   uploadFormCommentField.removeEventListener('input', commentFieldInputHandler);
   uploadButtonModalClose.removeEventListener('click', imgUploadButtonCloseModalClickHandler);
   uploadForm.removeEventListener('submit', uploadFormSubmitHandler);
   uploadOverlay.removeEventListener('click', imgUploadOverlayClickHandler);
-  uploadImageScale.removeEventListener('click', changeImagePreviewSize);
+  imgUploadContainer.removeEventListener('click', imgUploadContainerClickHandler);
+  uploadImageScale.removeEventListener('click', uploadImageScaleClickHandler);
 }
 
 uploadFileControl.addEventListener('change', uploadFileControlChangeHandler);
