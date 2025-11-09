@@ -8,7 +8,8 @@ const HASHTAG_MIN_CHARACTERS_NUMBER = 2;
 const HASHTAG_MAX_CHARACTERS_NUMBER = 20;
 const HASHTAG_REG_EXP = /^#[a-zA-Zа-яА-ЯёЁ0-9]{1,19}$/;
 const DEFAULT_IMG_URL = 'img/upload-default-image.jpg';
-const ALLOWED_FILES_FORMATS = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/svg', 'image/webp'];
+const ALLOWED_FILES_FORMATS = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+const DEFAULT_SCALING_VALUE = '100%';
 
 const EFFECT_CONFIGS = {
   chrome: { filter: 'grayscale', start: 1, min: 0, max: 1, step: 0.1, unit: '' },
@@ -260,6 +261,32 @@ const uploadFileControlChangeHandler = ()=> {
   uploadImageScale.addEventListener('click', uploadImageScaleClickHandler);
 };
 
+const resetFilters = ()=> {
+  const radioInputNoneEffect = imgUploadContainer.querySelector('.effects__radio');
+
+  uploadImagePreviewEffectSlider.noUiSlider.updateOptions({
+    start: EFFECT_CONFIGS.none.start,
+    range: { min: EFFECT_CONFIGS.none.min, max: EFFECT_CONFIGS.none.max },
+    step: EFFECT_CONFIGS.none.step
+  });
+
+  uploadImagePreviewEffectSlider.noUiSlider.set(EFFECT_CONFIGS.none.start);
+  uploadImagePreviewEffectSlider.parentNode.hidden = true;
+
+  imgUploadContainer.querySelectorAll('.effects__radio').forEach((radioInput)=> {
+    radioInput.checked = false;
+    radioInputNoneEffect.checked = true;
+  });
+};
+
+const resetScaling = ()=> {
+  uploadImageScaleInput.value = DEFAULT_SCALING_VALUE;
+};
+
+const resetImagePreview = ()=> {
+  uploadImagePreview.removeAttribute('style');
+};
+
 function closeModal() {
   pristineInstance.reset();
   uploadOverlay.classList.add('hidden');
@@ -269,16 +296,11 @@ function closeModal() {
   uploadFormHashTagField.value = '';
   uploadFileControl.value = '';
 
-  uploadImagePreview.style.filter = '';
+  resetFilters();
+  resetScaling();
+  resetImagePreview();
+
   uploadImagePreviewSliderControl.value = '';
-
-  uploadImagePreviewEffectSlider.noUiSlider.updateOptions({
-    start: EFFECT_CONFIGS.none.start,
-    range: { min: EFFECT_CONFIGS.none.min, max: EFFECT_CONFIGS.none.max },
-    step: EFFECT_CONFIGS.none.step
-  });
-  uploadImagePreviewEffectSlider.noUiSlider.set(EFFECT_CONFIGS.none.start);
-
   document.removeEventListener('keydown', documentKeydownHandler);
   uploadFormHashTagField.removeEventListener('input', hashTagFieldInputHandler);
   uploadFormCommentField.removeEventListener('input', commentFieldInputHandler);
