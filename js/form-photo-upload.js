@@ -8,6 +8,21 @@ const HASHTAG_MIN_CHARACTERS_NUMBER = 2;
 const HASHTAG_MAX_CHARACTERS_NUMBER = 20;
 const HASHTAG_REG_EXP = /^#[a-zA-Zа-яА-ЯёЁ0-9]{1,19}$/;
 const DEFAULT_IMG_URL = 'img/upload-default-image.jpg';
+const ALLOWED_FILES_FORMATS = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+const DEFAULT_SCALING_VALUE = '100%';
+
+const EFFECT_CONFIGS = {
+  chrome: { filter: 'grayscale', start: 1, min: 0, max: 1, step: 0.1, unit: '' },
+  sepia: { filter: 'sepia', start: 1, min: 0, max: 1, step: 0.1, unit: '' },
+  marvin: { filter: 'invert', start: 100, min: 0, max: 100, step: 1, unit: '%' },
+  phobos: { filter: 'blur', start: 3, min: 0, max: 3, step: 0.1, unit: 'px' },
+  heat: { filter: 'brightness', start: 3, min: 1, max: 3, step: 0.1, unit: '' },
+  none: { filter: '', start: 1, min: 0, max: 1, step: 0.1, unit: '' }
+};
+
+const SCALING_STEP_VALUE = 25;
+const SCALING_VALUE_MIN = 25;
+const SCALING_VALUE_MAX = 100;
 
 const imgUploadContainer = document.querySelector('.img-upload');
 const uploadForm = imgUploadContainer.querySelector('#upload-select-image');
@@ -19,7 +34,14 @@ const uploadButtonModalClose = imgUploadContainer.querySelector('#upload-cancel'
 const uploadFormButtonSubmit = imgUploadContainer.querySelector('#upload-submit');
 const uploadImagePreview = imgUploadContainer.querySelector('.img-upload__preview img');
 const uploadImagePreviewEffectThumbnails = imgUploadContainer.querySelectorAll('.effects__preview');
+const uploadImagePreviewSliderControl = imgUploadContainer.querySelector('.effect-level__value');
+const uploadImagePreviewEffectSlider = imgUploadContainer.querySelector('.effect-level__slider');
 
+const uploadImageScale = imgUploadContainer.querySelector('.scale');
+const uploadImageScaleInput = uploadImageScale.querySelector('.scale__control--value');
+
+
+// Проверка полей 'комментарий' и 'хэштеги'
 let hashTagErrorMessage = '';
 const getHashTagErrorString = () => hashTagErrorMessage;
 
@@ -35,6 +57,11 @@ const pristineInstance = new Pristine(uploadForm, pristineConfig);
 
 const getFileURL = ()=> {
   const file = uploadFileControl.files[0];
+
+  if (file && !ALLOWED_FILES_FORMATS.includes(file.type)) {
+    uploadFileControl.value = '';
+    return DEFAULT_IMG_URL;
+  }
 
   return file ? URL.createObjectURL(file) : DEFAULT_IMG_URL;
 };
@@ -103,6 +130,84 @@ pristineInstance.addValidator(
   false
 );
 
+
+// Наложение эффекта на изображение
+const noUiSliderConfig = {
+  start: 1,
+  range: {
+    min: 0,
+    max: 1
+  },
+  step: 0.1,
+  connect: 'lower'
+};
+
+noUiSlider.create(uploadImagePreviewEffectSlider, noUiSliderConfig);
+
+uploadImagePreviewEffectSlider.parentNode.hidden = true;
+
+const hideSlider = (evt)=> {
+  const sliderContainer = uploadImagePreviewEffectSlider.parentNode;
+  const effectPreview = evt.target.closest('.effects__preview');
+
+  if (effectPreview) {
+    const isNoneEffect = effectPreview.classList.contains('effects__preview--none');
+
+    sliderContainer.hidden = isNoneEffect;
+  }
+
+  return false;
+};
+
+// Функция установки эффекта фильтра
+const imgUploadContainerClickHandler = (evt)=> {
+  hideSlider(evt);
+  if (evt.target.classList.contains('effects__preview')) {
+    const effectString = evt.target.className.split('--')[1];
+    const config = EFFECT_CONFIGS[effectString];
+
+    uploadImagePreviewEffectSlider.noUiSlider.off('update');
+
+    uploadImagePreviewEffectSlider.noUiSlider.updateOptions({
+      start: config.start,
+      range: {
+        min: config.min,
+        max: config.max
+      },
+      step: config.step,
+      connect: 'lower'
+    });
+
+    uploadImagePreviewEffectSlider.noUiSlider.on('update', () => {
+      const value = uploadImagePreviewEffectSlider.noUiSlider.get();
+
+      uploadImagePreview.style.filter = config.filter ? `${config.filter}(${value}${config.unit})` : '';
+      uploadImagePreviewSliderControl.value = value;
+    });
+  }
+};
+
+// Функция изменения масштаба изображения
+const uploadImageScaleClickHandler = (evt)=> {
+  let sizeValue = +uploadImageScaleInput.value.slice(0, -1);
+
+
+  if (evt.target.classList.contains('scale__control--smaller')) {
+    if (sizeValue > SCALING_VALUE_MIN) {
+      sizeValue -= SCALING_STEP_VALUE;
+    }
+  } else if (evt.target.classList.contains('scale__control--bigger')) {
+    if (sizeValue < SCALING_VALUE_MAX) {
+      sizeValue += SCALING_STEP_VALUE;
+    }
+  }
+
+  uploadImageScaleInput.value = `${ sizeValue }%`;
+  uploadImagePreview.style.transform = `scale(${ sizeValue / 100 })`;
+};
+
+
+// Функции-обработчики
 const uploadFormSubmitHandler = (evt)=> {
   evt.preventDefault();
   const isValid = pristineInstance.validate();
@@ -152,6 +257,27 @@ const uploadFileControlChangeHandler = ()=> {
   uploadForm.addEventListener('submit', uploadFormSubmitHandler);
   uploadButtonModalClose.addEventListener('click', imgUploadButtonCloseModalClickHandler, { once: true });
   uploadOverlay.addEventListener('click', imgUploadOverlayClickHandler);
+  imgUploadContainer.addEventListener('click', imgUploadContainerClickHandler);
+  uploadImageScale.addEventListener('click', uploadImageScaleClickHandler);
+};
+
+const resetFilters = ()=> {
+  uploadImagePreviewEffectSlider.noUiSlider.updateOptions({
+    start: EFFECT_CONFIGS.none.start,
+    range: { min: EFFECT_CONFIGS.none.min, max: EFFECT_CONFIGS.none.max },
+    step: EFFECT_CONFIGS.none.step
+  });
+
+  uploadImagePreviewEffectSlider.noUiSlider.set(EFFECT_CONFIGS.none.start);
+  uploadImagePreviewEffectSlider.parentNode.hidden = true;
+};
+
+const resetScaling = ()=> {
+  uploadImageScaleInput.value = DEFAULT_SCALING_VALUE;
+};
+
+const resetImagePreview = ()=> {
+  uploadImagePreview.removeAttribute('style');
 };
 
 function closeModal() {
@@ -159,16 +285,21 @@ function closeModal() {
   uploadOverlay.classList.add('hidden');
   body.classList.remove('modal-open');
   uploadImagePreview.src = DEFAULT_IMG_URL;
-  uploadFormCommentField.value = '';
-  uploadFormHashTagField.value = '';
-  uploadFileControl.value = '';
+  uploadForm.reset();
 
+  resetFilters();
+  resetScaling();
+  resetImagePreview();
+
+  uploadImagePreviewSliderControl.value = '';
   document.removeEventListener('keydown', documentKeydownHandler);
   uploadFormHashTagField.removeEventListener('input', hashTagFieldInputHandler);
   uploadFormCommentField.removeEventListener('input', commentFieldInputHandler);
   uploadButtonModalClose.removeEventListener('click', imgUploadButtonCloseModalClickHandler);
   uploadForm.removeEventListener('submit', uploadFormSubmitHandler);
   uploadOverlay.removeEventListener('click', imgUploadOverlayClickHandler);
+  imgUploadContainer.removeEventListener('click', imgUploadContainerClickHandler);
+  uploadImageScale.removeEventListener('click', uploadImageScaleClickHandler);
 }
 
 uploadFileControl.addEventListener('change', uploadFileControlChangeHandler);
