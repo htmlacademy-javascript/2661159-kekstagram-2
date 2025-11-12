@@ -1,8 +1,10 @@
-import { getPhotos } from './photo-data-generator.js';
+import { getPhotos } from './photoService.js';
 import { renderThumbnails } from './render-thumbnails.js';
 import './form-photo-upload.js';
-import './api.js';
 
-const photoData = getPhotos();
+const photoData = async () => {
+  const photos = await getPhotos();
+  renderThumbnails(photos);
+};
 
-renderThumbnails(photoData);
+photoData();
