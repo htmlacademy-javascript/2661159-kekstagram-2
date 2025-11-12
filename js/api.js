@@ -17,10 +17,8 @@ const ErrorText = {
 
 const getData = async (route, method, body = null) => {
   const response = await fetch(`${BASE_URL}${route}`, { method, body});
-  if (!response.ok) {
-    throw new Error(ErrorText[method]);
-  }
-  return response.json();
+
+  return response.ok ? await response.json() : Promise.reject({ message: ErrorText[method], status: response.status });
 };
 
-export { BASE_URL, Route, Method, ErrorText, getData };
+export { Route, Method, getData };
