@@ -21,4 +21,8 @@ const getData = async (route, method, body = null) => {
   return response.ok ? await response.json() : Promise.reject({ message: ErrorText[method], status: response.status });
 };
 
-export { Route, Method, getData };
+const sendData = async (route, method, body) => {
+  await fetch(`${BASE_URL}${route}`, { method, body });
+};
+
+export { Route, Method, getData, sendData };

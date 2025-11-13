@@ -1,4 +1,5 @@
 import { body, pluralize } from './utils.js';
+import { sendData, Route, Method } from './api.js';
 
 const COMMENT_MAX_CHAR_NUMBER = 140;
 const MAX_HASHTAG_COUNT = 5;
@@ -206,17 +207,22 @@ const uploadImageScaleClickHandler = (evt)=> {
   uploadImagePreview.style.transform = `scale(${ sizeValue / 100 })`;
 };
 
-
-// Функции-обработчики
-const uploadFormSubmitHandler = (evt)=> {
-  evt.preventDefault();
+const sendFormData = async (form)=> {
   const isValid = pristineInstance.validate();
 
   uploadFormButtonSubmit.disabled = !isValid;
 
   if (isValid) {
-    uploadForm.submit();
+    await sendData(Route.SEND_DATA, Method.POST, new FormData(form));
+    closeModal();
   }
+};
+
+
+// Функции-обработчики
+const uploadFormSubmitHandler = (evt)=> {
+  evt.preventDefault();
+  sendFormData(evt.target);
 };
 
 const imgUploadButtonCloseModalClickHandler = () => {
