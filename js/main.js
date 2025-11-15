@@ -1,5 +1,5 @@
 import { showErrorMessage } from './message-handling.js';
-import { getPhotos } from './photoService.js';
+import { getPhotos } from './photo-service.js';
 import { renderThumbnails } from './render-thumbnails.js';
 import './form-photo-upload.js';
 
