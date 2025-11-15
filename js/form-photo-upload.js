@@ -1,5 +1,6 @@
 import { body, pluralize } from './utils.js';
 import { sendData, Route, Method } from './api.js';
+import { appendNotification } from './notifications.js';
 
 const COMMENT_MAX_CHAR_NUMBER = 140;
 const MAX_HASHTAG_COUNT = 5;
@@ -24,6 +25,11 @@ const EFFECT_CONFIGS = {
 const SCALING_STEP_VALUE = 25;
 const SCALING_VALUE_MIN = 25;
 const SCALING_VALUE_MAX = 100;
+
+const SUBMIT_BUTTON_TEXT_DEFAULT = 'Опубликовать';
+const SUBMIT_BUTTON_TEXT_SENDING = 'Идет публикация...';
+const successMessageTemplate = document.querySelector('#success').content;
+const errorMessageTemplate = document.querySelector('#error').content;
 
 const imgUploadContainer = document.querySelector('.img-upload');
 const uploadForm = imgUploadContainer.querySelector('#upload-select-image');
@@ -207,14 +213,34 @@ const uploadImageScaleClickHandler = (evt)=> {
   uploadImagePreview.style.transform = `scale(${ sizeValue / 100 })`;
 };
 
+const disableSubmitButton = (text)=> {
+  uploadFormButtonSubmit.disabled = true;
+  uploadFormButtonSubmit.textContent = text;
+};
+
+const enableSubmitButton = (text)=> {
+  uploadFormButtonSubmit.disabled = false;
+  uploadFormButtonSubmit.textContent = text;
+};
+
 const sendFormData = async (form)=> {
   const isValid = pristineInstance.validate();
 
-  uploadFormButtonSubmit.disabled = !isValid;
+  if (!isValid) {
+    disableSubmitButton(SUBMIT_BUTTON_TEXT_DEFAULT);
+  } else {
+    disableSubmitButton(SUBMIT_BUTTON_TEXT_SENDING);
 
-  if (isValid) {
-    await sendData(Route.SEND_DATA, Method.POST, new FormData(form));
-    closeModal();
+    try {
+      await sendData(Route.SEND_DATA, Method.POST, new FormData(form));
+      appendNotification(successMessageTemplate, ()=> {
+        closeModal();
+      });
+    } catch (error) {
+      appendNotification(errorMessageTemplate);
+    } finally {
+      enableSubmitButton(SUBMIT_BUTTON_TEXT_DEFAULT);
+    }
   }
 };
 

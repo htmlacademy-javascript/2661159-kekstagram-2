@@ -22,7 +22,11 @@ const getData = async (route, method, body = null) => {
 };
 
 const sendData = async (route, method, body) => {
-  await fetch(`${BASE_URL}${route}`, { method, body });
+  const response = await fetch(`${BASE_URL}${route}`, { method, body });
+
+  if (!response.ok) {
+    throw new Error(ErrorText[method]);
+  }
 };
 
 export { Route, Method, getData, sendData };
