@@ -26,9 +26,14 @@ const getThumbnail = (template, data)=> {
   return fragment;
 };
 
+const clearThumbnail = ()=> {
+  picturesContainer.querySelectorAll('.picture').forEach((thumbnail) => thumbnail.remove());
+};
+
 const renderThumbnails = (data)=> {
   const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
 
+  clearThumbnail();
   picturesContainer.append(getThumbnail(pictureTemplate, data));
   picturesContainer.addEventListener('click', thumbnailClickHandler(data));
 };
