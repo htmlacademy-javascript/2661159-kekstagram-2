@@ -1,9 +1,10 @@
 import { shuffleArray, debounce } from './utils.js';
 import { renderThumbnails } from './render-thumbnails.js';
 
+const DEBOUNCE_DELAY = 500;
 const FILTER_BUTTON_ACTIVE_CLASS = 'img-filters__button--active';
 
-const debouncedRender = debounce(renderThumbnails, 500);
+const debouncedRender = debounce(renderThumbnails, DEBOUNCE_DELAY);
 const filtersBlock = document.querySelector('.img-filters__form');
 let originalPhotos = [];
 
@@ -33,7 +34,7 @@ function filtersBlockClickHandler(evt) {
     return;
   }
 
-  Array.from(filtersBlock.children).forEach((button)=> {
+  Array.from(filtersBlock.children).forEach((button) => {
     button.classList.toggle(FILTER_BUTTON_ACTIVE_CLASS, button === filterButton);
   });
 

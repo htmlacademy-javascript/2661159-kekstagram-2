@@ -1,3 +1,5 @@
+const RANDOM_PHOTO_NUMBER = 10;
+
 const body = document.querySelector('body');
 
 // Получение рандомного целого числа из диапазона от a до b
@@ -30,8 +32,8 @@ const createUniqueValueFromRange = (min, max) => {
 };
 
 // Перемешивание массива
-const shuffleArray = (array, count = 10)=> {
-  const shuffled = array.sort(()=> Math.random() - 0.5);
+const shuffleArray = (array, count = RANDOM_PHOTO_NUMBER) => {
+  const shuffled = array.sort(() => Math.random() - 0.5);
   return shuffled.slice(0, count);
 };
 

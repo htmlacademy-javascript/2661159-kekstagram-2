@@ -15,15 +15,15 @@ const commentsCount = {
 let allReceivedComments = [];
 let currentDisplayedCount = COMMENTS_SHOWN;
 
-const loadMoreComments = ()=> {
+const loadMoreComments = () => {
   currentDisplayedCount += COMMENTS_SHOWN;
-  commentsContainer.innerHTML = allReceivedComments.slice(0, currentDisplayedCount).reduce((acc, comment)=> acc + getCommentTemplate(comment), '');
+  commentsContainer.innerHTML = allReceivedComments.slice(0, currentDisplayedCount).reduce((acc, comment) => acc + getCommentTemplate(comment), '');
   commentsCount.shown.textContent = allReceivedComments.length <= currentDisplayedCount ? allReceivedComments.length : currentDisplayedCount;
   commentsCount.total.textContent = allReceivedComments.length;
   buttonLoadMore.classList.toggle('hidden', allReceivedComments.length <= currentDisplayedCount);
 };
 
-const buttonLoadMoreClickHandler = ()=> {
+const buttonLoadMoreClickHandler = () => {
   loadMoreComments();
 };
 
@@ -37,7 +37,7 @@ const buttonCloseModalClickHandler = () => {
   closeModal();
 };
 
-const EscPressHandler = (evt)=> {
+const documentKeydownHandler = (evt) => {
   if (evt.key === 'Escape') {
     bigPictureContainer.classList.add('hidden');
     buttonCloseModal.removeEventListener('click', buttonCloseModalClickHandler);
@@ -68,7 +68,7 @@ function getCommentTemplate(comment) {
    `;
 }
 
-const renderBigPhoto = ({ url, description, likes, comments })=> {
+const renderBigPhoto = ({ url, description, likes, comments }) => {
 
   allReceivedComments = comments;
 
@@ -81,19 +81,19 @@ const renderBigPhoto = ({ url, description, likes, comments })=> {
   commentsCount.total.textContent = comments.length;
   buttonLoadMore.classList.toggle('hidden', comments.length <= COMMENTS_SHOWN);
 
-  commentsContainer.innerHTML = comments.slice(0, COMMENTS_SHOWN).reduce((acc, comment)=> acc + getCommentTemplate(comment), '');
+  commentsContainer.innerHTML = comments.slice(0, COMMENTS_SHOWN).reduce((acc, comment) => acc + getCommentTemplate(comment), '');
 
   bigPictureContainer.classList.remove('hidden');
   body.classList.add('modal-open');
 };
 
-const thumbnailClickHandler = (data)=> function (evt) {
+const thumbnailClickHandler = (data) => function (evt) {
   const currentLink = evt.target.closest('a.picture');
 
   if (currentLink) {
     evt.preventDefault();
     const currentPhotoID = +currentLink.dataset.photoId;
-    const photo = data.find((item)=> item.id === currentPhotoID);
+    const photo = data.find((item) => item.id === currentPhotoID);
 
     if (photo) {
       renderBigPhoto(photo);
@@ -105,6 +105,6 @@ const thumbnailClickHandler = (data)=> function (evt) {
   buttonLoadMore.addEventListener('click', buttonLoadMoreClickHandler);
 };
 
-document.addEventListener('keydown', EscPressHandler);
+document.addEventListener('keydown', documentKeydownHandler);
 
 export { thumbnailClickHandler };

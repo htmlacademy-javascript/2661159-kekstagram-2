@@ -4,15 +4,15 @@ const MESSAGE_LIVE_TIME = 5000;
 
 const errorTemplate = body.querySelector('#data-error').content;
 
-const deleteMessageWithDelay = (cssClassName, delay)=> {
+const deleteMessageWithDelay = (cssClassName, delay) => {
   const errorBlock = body.querySelector(cssClassName);
 
-  setTimeout(()=> {
+  setTimeout(() => {
     errorBlock.remove();
   }, delay);
 };
 
-const showErrorMessage = ()=> {
+const showErrorMessage = () => {
   const deepTemplateClone = errorTemplate.cloneNode(true);
 
   body.append(deepTemplateClone);
