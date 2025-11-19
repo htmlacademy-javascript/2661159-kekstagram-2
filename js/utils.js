@@ -30,7 +30,10 @@ const createUniqueValueFromRange = (min, max) => {
 };
 
 // Перемешивание массива
-const shuffleArray = (array)=> array.sort(()=> Math.random() - 0.5);
+const shuffleArray = (array, count = 10)=> {
+  const shuffled = array.sort(()=> Math.random() - 0.5);
+  return shuffled.slice(0, count);
+};
 
 // Склонение слова после числа
 const pluralize = (num, declensions) => {
