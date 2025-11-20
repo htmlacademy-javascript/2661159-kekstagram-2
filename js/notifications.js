@@ -4,9 +4,9 @@ const closeNotificationModal = (evt) => {
   evt.stopPropagation();
 
   const notification = document.querySelector('.success') || document.querySelector('.error');
-  const buttonCloseNotification = notification.querySelector('.button');
+  const buttonCloseNotification = notification.querySelector('button');
 
-  if (evt.target !== notification || evt.target !== buttonCloseNotification || evt.key === 'Escape') {
+  if (evt.target === notification || evt.target === buttonCloseNotification || evt.key === 'Escape') {
     notification.remove();
     body.removeEventListener('click', bodyClickHandler);
     body.removeEventListener('keydown', bodyKeydownHandler);
