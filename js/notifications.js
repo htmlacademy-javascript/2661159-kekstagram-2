@@ -8,8 +8,8 @@ const closeNotificationModal = (evt) => {
 
   if (evt.target !== notification || evt.target !== buttonCloseNotification || evt.key === 'Escape') {
     notification.remove();
-    body.removeEventListener('click', closeNotificationModal);
-    body.removeEventListener('keydown', closeNotificationModal);
+    body.removeEventListener('click', bodyClickHandler);
+    body.removeEventListener('keydown', bodyKeydownHandler);
   }
 };
 
@@ -19,8 +19,16 @@ const appendNotification = (template, cb = null) => {
   const deepTemplateClone = template.cloneNode(true);
 
   body.append(deepTemplateClone);
-  body.addEventListener('click', closeNotificationModal);
-  body.addEventListener('keydown', closeNotificationModal);
+  body.addEventListener('click', bodyClickHandler);
+  body.addEventListener('keydown', bodyKeydownHandler);
 };
 
-export { closeNotificationModal, appendNotification };
+function bodyClickHandler(evt) {
+  closeNotificationModal(evt);
+}
+
+function bodyKeydownHandler(evt) {
+  closeNotificationModal(evt);
+}
+
+export { appendNotification };

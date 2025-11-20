@@ -2,10 +2,10 @@ import { thumbnailClickHandler } from './render-big-photo.js';
 
 const picturesContainer = document.querySelector('.pictures');
 
-const getThumbnail = (template, data)=> {
+const getThumbnail = (template, data) => {
   const fragment = document.createDocumentFragment();
 
-  data.forEach((item)=> {
+  data.forEach((item) => {
     const deepTemplateClone = template.cloneNode(true);
     const clonedTemplate = {
       img: deepTemplateClone.querySelector('.picture__img'),
@@ -26,11 +26,11 @@ const getThumbnail = (template, data)=> {
   return fragment;
 };
 
-const clearThumbnail = ()=> {
+const clearThumbnail = () => {
   picturesContainer.querySelectorAll('.picture').forEach((thumbnail) => thumbnail.remove());
 };
 
-const renderThumbnails = (data)=> {
+const renderThumbnails = (data) => {
   const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
 
   clearThumbnail();
