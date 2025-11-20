@@ -32,28 +32,24 @@ const buttonLoadMoreClickHandler = () => {
 
 const bigPictureContainerClickHandler = (evt) => {
   if (evt.target.classList.contains('overlay')) {
-    closeModal();
+    closeModalAndResetState();
   }
 };
 
 const buttonCloseModalClickHandler = () => {
-  closeModal();
+  closeModalAndResetState();
 };
 
 const documentKeydownHandler = (evt) => {
   if (evt.key === 'Escape') {
-    bigPictureContainer.classList.add('hidden');
-    body.classList.remove('modal-open');
-    buttonCloseModal.removeEventListener('click', buttonCloseModalClickHandler);
-    bigPictureContainer.removeEventListener('click', bigPictureContainerClickHandler);
-    buttonLoadMore.removeEventListener('click', buttonLoadMoreClickHandler);
-    currentDisplayedCount = COMMENTS_SHOWN;
+    closeModalAndResetState();
   }
 };
 
-function closeModal() {
+function closeModalAndResetState() {
   bigPictureContainer.classList.add('hidden');
   body.classList.remove('modal-open');
+  buttonCloseModal.removeEventListener('click', buttonCloseModalClickHandler);
   bigPictureContainer.removeEventListener('click', bigPictureContainerClickHandler);
   buttonLoadMore.removeEventListener('click', buttonLoadMoreClickHandler);
   currentDisplayedCount = COMMENTS_SHOWN;
