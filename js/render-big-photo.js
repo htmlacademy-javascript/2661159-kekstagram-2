@@ -40,6 +40,7 @@ const buttonCloseModalClickHandler = () => {
 const documentKeydownHandler = (evt) => {
   if (evt.key === 'Escape') {
     bigPictureContainer.classList.add('hidden');
+    body.classList.remove('modal-open');
     buttonCloseModal.removeEventListener('click', buttonCloseModalClickHandler);
     bigPictureContainer.removeEventListener('click', bigPictureContainerClickHandler);
     buttonLoadMore.removeEventListener('click', buttonLoadMoreClickHandler);
