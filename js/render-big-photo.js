@@ -16,8 +16,11 @@ let allReceivedComments = [];
 let currentDisplayedCount = COMMENTS_SHOWN;
 
 const loadMoreComments = () => {
+  clearContainer(commentsContainer);
+
   currentDisplayedCount += COMMENTS_SHOWN;
-  commentsContainer.innerHTML = allReceivedComments.slice(0, currentDisplayedCount).reduce((acc, comment) => acc + getCommentTemplate(comment), '');
+
+  renderCommentsToContainer(commentsContainer, allReceivedComments.slice(0, currentDisplayedCount));
   commentsCount.shown.textContent = allReceivedComments.length <= currentDisplayedCount ? allReceivedComments.length : currentDisplayedCount;
   commentsCount.total.textContent = allReceivedComments.length;
   buttonLoadMore.classList.toggle('hidden', allReceivedComments.length <= currentDisplayedCount);
@@ -29,46 +32,69 @@ const buttonLoadMoreClickHandler = () => {
 
 const bigPictureContainerClickHandler = (evt) => {
   if (evt.target.classList.contains('overlay')) {
-    closeModal();
+    closeModalAndResetState();
   }
 };
 
 const buttonCloseModalClickHandler = () => {
-  closeModal();
+  closeModalAndResetState();
 };
 
 const documentKeydownHandler = (evt) => {
   if (evt.key === 'Escape') {
-    bigPictureContainer.classList.add('hidden');
-    buttonCloseModal.removeEventListener('click', buttonCloseModalClickHandler);
-    bigPictureContainer.removeEventListener('click', bigPictureContainerClickHandler);
-    buttonLoadMore.removeEventListener('click', buttonLoadMoreClickHandler);
-    currentDisplayedCount = COMMENTS_SHOWN;
+    closeModalAndResetState();
   }
 };
 
-function closeModal() {
+function closeModalAndResetState() {
   bigPictureContainer.classList.add('hidden');
   body.classList.remove('modal-open');
+  buttonCloseModal.removeEventListener('click', buttonCloseModalClickHandler);
   bigPictureContainer.removeEventListener('click', bigPictureContainerClickHandler);
   buttonLoadMore.removeEventListener('click', buttonLoadMoreClickHandler);
   currentDisplayedCount = COMMENTS_SHOWN;
 }
 
 function getCommentTemplate(comment) {
-  return `
-     <li class="social__comment">
-       <img
-         class="social__picture"
-         src="${ comment.avatar }"
-         alt="${ comment.name }"
-         width="35" height="35">
-       <p class="social__text">${ comment.message }</p>
-     </li>
-   `;
+  const li = document.createElement('li');
+  const img = document.createElement('img');
+  const p = document.createElement('p');
+
+  li.classList.add('social__comment');
+
+  img.className = 'social__picture';
+  img.src = comment.avatar;
+  img.alt = comment.name;
+  img.width = 35;
+  img.height = 35;
+
+  p.className = 'social__text';
+  p.textContent = comment.message;
+
+  li.append(img, p);
+  return li;
+}
+
+function clearContainer(container) {
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
+}
+
+function renderCommentsToContainer(container, comments) {
+  const fragment = document.createDocumentFragment();
+
+  clearContainer(container);
+
+  comments.forEach((comment) => {
+    fragment.append(getCommentTemplate(comment));
+  });
+
+  container.append(fragment);
 }
 
 const renderBigPhoto = ({ url, description, likes, comments }) => {
+  clearContainer(commentsContainer);
 
   allReceivedComments = comments;
 
@@ -81,7 +107,7 @@ const renderBigPhoto = ({ url, description, likes, comments }) => {
   commentsCount.total.textContent = comments.length;
   buttonLoadMore.classList.toggle('hidden', comments.length <= COMMENTS_SHOWN);
 
-  commentsContainer.innerHTML = comments.slice(0, COMMENTS_SHOWN).reduce((acc, comment) => acc + getCommentTemplate(comment), '');
+  renderCommentsToContainer(commentsContainer, comments.slice(0, COMMENTS_SHOWN));
 
   bigPictureContainer.classList.remove('hidden');
   body.classList.add('modal-open');
